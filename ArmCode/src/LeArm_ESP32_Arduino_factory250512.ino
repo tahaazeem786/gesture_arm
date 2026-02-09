@@ -64,9 +64,13 @@ void setup() {
   arm.init();
   
   // TEST: Verify ESP32→arm communication with a servo twitch
-  arm.knot_run(4, 400, 500); // Move servo 4 slightly for 500ms
-  delay(1000);
-  arm.knot_run(4, 500, 500); // Return servo 4 to center
+  uint8_t servo_type_detected = arm.get_servo_type();
+  Serial.print("Servo type: ");
+  Serial.println(servo_type_detected);
+  
+  arm.knot_run(4, 450, 1000); // Move servo 4 for 1 second
+  delay(1500);
+  arm.knot_run(4, 500, 1000); // Return to center position
   delay(500);
   
   led_obj.init(IO_LED);
