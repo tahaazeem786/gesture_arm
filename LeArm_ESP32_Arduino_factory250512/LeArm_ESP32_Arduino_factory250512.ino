@@ -61,6 +61,7 @@ void setup() {
   pinMode(PA5, OUTPUT);
 
   Serial.begin(9600);
+  Serial.println("System starting...");
   arm.init();
   led_obj.init(IO_LED);
   buzzer_obj.init(IO_BUZZER);
@@ -73,6 +74,7 @@ void setup() {
   delay(100);
   key_obj.register_callback(button_change_mode);
   led_obj.blink(2000, 2000, 0);
+  
   if(arm.get_servo_type() == 0){
     buzzer_obj.blink(5000 , 50, 50, 1);
   }else{
@@ -85,17 +87,21 @@ void setup() {
 void loop() {
   switch(mode_flag){
     case 0: // Bluetooth mode
-    case 1: // PC mode
-      pc_ble_obj.PC_BLE_Task(&arm , &led_obj , &buzzer_obj);
+      Serial.println("BLE");
+    case 1: // PC mode (current mode being used with ESP32)
+      pc_ble_obj.PC_BLE_Task(&arm , &led_obj , &buzzer_obj); // want to edit the PC_BLE_TASK funciton to control arm with ESP32
+      Serial.println("PC");
       break;
     case 2: // PS2 controller mode
       ps2.PS2_Task(&arm, &led_obj, &buzzer_obj);
+      Serial.println("PS2");
       break;
     case 3: // Offline control mode
       if(button_2_flag != 0){
         arm.action_run(17,1);
         button_2_flag = 0;
       }
+      Serial.println("OFFLINE");
       break;
     default:
       break;
