@@ -68,9 +68,14 @@ void setup() {
   Serial.print("Servo type: ");
   Serial.println(servo_type_detected);
   
-  arm.knot_run(4, 450, 1000); // Move servo 4 for 1 second
+  Serial.println("TEST: Sending reset command");
+  arm.reset(1000);  // Reset all servos to home position
   delay(1500);
-  arm.knot_run(4, 500, 1000); // Return to center position
+  
+  Serial.println("TEST: Moving servo 4");
+  arm.knot_run(4, 1200, 1000);  // Move servo 4
+  delay(1500);
+  arm.knot_run(4, 1500, 1000);  // Return to center
   delay(500);
   
   led_obj.init(IO_LED);
