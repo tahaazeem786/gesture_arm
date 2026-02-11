@@ -61,31 +61,35 @@ void setup() {
   pinMode(PA5, OUTPUT);
 
   Serial.begin(9600);
-  arm.init();
-  
-  // TEST: Verify ESP32→arm communication with a servo twitch
-  uint8_t servo_type_detected = arm.get_servo_type();
-  Serial.print("Servo type: ");
-  Serial.println(servo_type_detected);
-  
-  Serial.println("TEST: Sending reset command");
-  arm.reset(1000);  // Reset all servos to home position
-  delay(1500);
-  
-  Serial.println("TEST: Moving servo 4");
-  arm.knot_run(4, 1200, 1000);  // Move servo 4
-  delay(1500);
-  arm.knot_run(4, 1500, 1000);  // Return to center
-  delay(500);
-  
+
+  // initialize LED and buzzer early so we can signal at boot
   led_obj.init(IO_LED);
   buzzer_obj.init(IO_BUZZER);
   key_obj.init();
-  
+
+  // initialize arm and perform a short boot sequence (beep + move)
+  arm.init();
+  Serial.println("BOOT: performing startup sequence");
+
+  // simple beep + LED blink pattern
+  led_obj.blink(150, 150, 3);
+  buzzer_obj.blink(1500, 120, 120, 3);
+  delay(1000);
+
+  // quick reset and small motions to verify control
+  arm.reset(800);
+  delay(900);
+  arm.claw_set(90.0f, 600);
+  delay(700);
+  arm.roll_set(45.0f, 600);
+  delay(700);
+  arm.claw_set(0.0f, 600);
+  delay(700);
+
+  // Initialize control interfaces
   ps2.init();
   pc_ble_obj.init(1); // 0: select PC control mode
 
-  ps2.init();
   delay(100);
   key_obj.register_callback(button_change_mode);
   led_obj.blink(2000, 2000, 0);
