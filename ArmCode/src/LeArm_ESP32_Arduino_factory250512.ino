@@ -58,13 +58,16 @@ void setup() {
   pinMode(IO_BLE_CTL, OUTPUT);
   digitalWrite(IO_BLE_CTL, LOW);  // Set BLE control pin LOW to cut power to the Bluetooth module
 
+  Serial.println("Starting up...");
+  delay(100);
 
-  pinMode(PA4, OUTPUT);
-  pinMode(PA5, OUTPUT);
-  // pinMode(1, OUTPUT);
-  // pinMode(3, OUTPUT);
+  // pinMode(PA4, OUTPUT);
+  // pinMode(PA5, OUTPUT);
+  // pinMode(5, OUTPUT);
+  // pinMode(4, OUTPUT);
 
   Serial.println("Arm initializing...");
+  delay(100);
   // initialize arm first (this sets up Serial1 and servos)
   arm.init();
 

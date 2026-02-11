@@ -503,10 +503,13 @@ uint8_t LeArm_t::read_servo_type(void)
 
 void LeArm_t::init(void)
 {
-    flash_obj.init();
+	flash_obj.init(); // CORRECT PINS
+	Serial1.begin(115200 ,SERIAL_8N1 , RX0_PIN , TX0_PIN);
 
-	Serial1.begin(115200 ,SERIAL_8N1 , BUS_RX , BUS_TX);
-    busservo_obj.init(&Serial1);
+	Serial.println("Serial1 Initialized");
+	delay(100);
+
+    busservo_obj.init(&Serial1); // this is taking a LONG time
 	servo_type = read_servo_type();
 
 // #if (SERVO_TYPE == TYPE_PWM_SERVO)
@@ -515,6 +518,7 @@ if(servo_type == 0){
     pwmservo_obj.init();
 // #else
 }else{
+	Serial.println("Serial_servo initializing...");
 	serial_servo_offset_init();
 	reset(1000);
 }

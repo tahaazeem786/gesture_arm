@@ -55,6 +55,9 @@
 #define BUS_RX      35
 #define BUS_EN      14
 
+#define RX0_PIN      3
+#define TX0_PIN      1
+
 #define ADC_BAT     39
 
 #define IO_BUTTON    36
