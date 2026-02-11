@@ -59,6 +59,8 @@ void setup() {
 
   pinMode(PA4, OUTPUT);
   pinMode(PA5, OUTPUT);
+  // pinMode(1, OUTPUT);
+  // pinMode(3, OUTPUT);
 
   Serial.begin(9600);
   arm.init();
@@ -73,9 +75,9 @@ void setup() {
   delay(1500);
   
   Serial.println("TEST: Moving servo 4");
-  arm.knot_run(4, 1200, 1000);  // Move servo 4
+  arm.knot_run(1, 1200, 1000);  // Move servo 4
   delay(1500);
-  arm.knot_run(4, 1500, 1000);  // Return to center
+  arm.knot_run(1, 1500, 1000);  // Return to center
   delay(500);
   
   led_obj.init(IO_LED);
