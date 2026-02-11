@@ -132,6 +132,7 @@ void loop() {
   static bool test_ran = false;
   if (!test_ran) {
     // one-time startup test (beeps + moves)
+    Serial.println("Running boot test sequence");
     led_obj.blink(150,150,3);
     buzzer_obj.blink(1500,120,120,3);
     delay(1000);
@@ -144,6 +145,7 @@ void loop() {
     arm.claw_set(0.0f,600);
     delay(700);
     test_ran = true;
+    Serial.println("Boot test sequence complete");
   }
   // remain idle so control tasks don't override the test
   delay(200);
