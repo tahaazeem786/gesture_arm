@@ -53,6 +53,7 @@ void button_change_mode(uint8_t id,  ButtonEventIDEnum event)
 }
 
 void setup() {
+  Serial.println("Setup Start");
   delay(1000);
   pinMode(IO_BLE_CTL, OUTPUT);
   digitalWrite(IO_BLE_CTL, LOW);  // Set BLE control pin LOW to cut power to the Bluetooth module
