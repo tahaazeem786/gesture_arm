@@ -54,21 +54,20 @@ void button_change_mode(uint8_t id,  ButtonEventIDEnum event)
 
 void setup() {
   Serial.begin(9600);
-  delay(100);
-  
-  Serial.println("Setup Start");
   delay(1000);
   pinMode(IO_BLE_CTL, OUTPUT);
   digitalWrite(IO_BLE_CTL, LOW);  // Set BLE control pin LOW to cut power to the Bluetooth module
+
 
   pinMode(PA4, OUTPUT);
   pinMode(PA5, OUTPUT);
   // pinMode(1, OUTPUT);
   // pinMode(3, OUTPUT);
 
+  Serial.println("Arm initializing...");
   // initialize arm first (this sets up Serial1 and servos)
   arm.init();
-  
+
   // Verify servo type
   uint8_t servo_type_detected = arm.get_servo_type();
   Serial.print("Servo type: ");

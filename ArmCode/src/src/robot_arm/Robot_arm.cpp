@@ -511,6 +511,7 @@ void LeArm_t::init(void)
 
 // #if (SERVO_TYPE == TYPE_PWM_SERVO)
 if(servo_type == 0){
+	Serial.println("PWM_servo initializing...");
     pwmservo_obj.init();
 // #else
 }else{
@@ -520,6 +521,7 @@ if(servo_type == 0){
 // #endif
 	kinematics_init(&kinematics);
 	memset(&robot_arm, 0, sizeof(RobotArmHandleTypeDef));
+	Serial.println("Action group initializing...");
 	action_group_init();
 }
 
