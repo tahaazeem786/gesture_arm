@@ -53,6 +53,9 @@ void button_change_mode(uint8_t id,  ButtonEventIDEnum event)
 }
 
 void setup() {
+  Serial.begin(9600);
+  delay(100);
+  
   Serial.println("Setup Start");
   delay(1000);
   pinMode(IO_BLE_CTL, OUTPUT);
@@ -63,18 +66,18 @@ void setup() {
   // pinMode(1, OUTPUT);
   // pinMode(3, OUTPUT);
 
-  Serial.begin(9600);
-
-  // initialize LED and buzzer early so we can signal at boot
+  // initialize arm first (this sets up Serial1 and servos)
   arm.init();
   
+  // Verify servo type
+  uint8_t servo_type_detected = arm.get_servo_type();
+  Serial.print("Servo type: ");
+  Serial.println(servo_type_detected);
   
   led_obj.init(IO_LED);
   buzzer_obj.init(IO_BUZZER);
   key_obj.init();
 
-  // initialize arm and perform a short boot sequence (beep + move)
-  arm.init();
   Serial.println("BOOT: performing startup sequence");
 
   // simple beep + LED blink pattern
