@@ -122,7 +122,33 @@ void setup() {
   delay(1000);
 }
 
+// Boot-test guard: set BOOT_TEST=1 in Config.h or via build_flags to enable
+#ifndef BOOT_TEST
+#define BOOT_TEST 0
+#endif
+
 void loop() {
+#if BOOT_TEST
+  static bool test_ran = false;
+  if (!test_ran) {
+    // one-time startup test (beeps + moves)
+    led_obj.blink(150,150,3);
+    buzzer_obj.blink(1500,120,120,3);
+    delay(1000);
+    arm.reset(800);
+    delay(900);
+    arm.claw_set(90.0f,600);
+    delay(700);
+    arm.roll_set(45.0f,600);
+    delay(700);
+    arm.claw_set(0.0f,600);
+    delay(700);
+    test_ran = true;
+  }
+  // remain idle so control tasks don't override the test
+  delay(200);
+  return;
+#else
   switch(mode_flag){
     case 0: // Bluetooth mode
     case 1: // PC mode
@@ -141,4 +167,5 @@ void loop() {
       break;
   }
   delay(10);
+#endif
 }
