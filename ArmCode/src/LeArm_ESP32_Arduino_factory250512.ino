@@ -124,7 +124,7 @@ void setup() {
 
 // Boot-test guard: set BOOT_TEST=1 in Config.h or via build_flags to enable
 #ifndef BOOT_TEST
-#define BOOT_TEST 0
+#define BOOT_TEST 1
 #endif
 
 void loop() {
