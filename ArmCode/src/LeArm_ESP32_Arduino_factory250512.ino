@@ -68,20 +68,6 @@ void setup() {
   // initialize LED and buzzer early so we can signal at boot
   arm.init();
   
-  // TEST: Verify ESP32→arm communication with a servo twitch
-  uint8_t servo_type_detected = arm.get_servo_type();
-  Serial.print("Servo type: ");
-  Serial.println(servo_type_detected);
-  
-  Serial.println("TEST: Sending reset command");
-  arm.reset(1000);  // Reset all servos to home position
-  delay(1500);
-  
-  Serial.println("TEST: Moving servo 4");
-  arm.knot_run(1, 1200, 1000);  // Move servo 4
-  delay(1500);
-  arm.knot_run(1, 1500, 1000);  // Return to center
-  delay(500);
   
   led_obj.init(IO_LED);
   buzzer_obj.init(IO_BUZZER);
