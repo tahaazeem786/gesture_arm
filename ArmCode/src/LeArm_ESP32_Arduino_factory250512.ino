@@ -14,6 +14,8 @@ PC_BLE_CTL pc_ble_obj;
 uint8_t mode_flag = 0;
 uint8_t button_2_flag = 0;
 
+
+
 void button_change_mode(uint8_t id,  ButtonEventIDEnum event)
 {
   if(event == BUTTON_EVENT_PRESSED)
@@ -65,6 +67,8 @@ void setup() {
   // pinMode(PA5, OUTPUT);
   // pinMode(5, OUTPUT);
   // pinMode(4, OUTPUT);
+
+  
 
   Serial.println("Arm initializing...");
   delay(100);

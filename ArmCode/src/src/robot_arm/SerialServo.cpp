@@ -2,8 +2,8 @@
 #include "stdint.h"
 #include "./../../Config.h"
 
-#define READ_LEVEL  LOW
-#define WRITE_LEVEL HIGH
+#define READ_LEVEL  HIGH
+#define WRITE_LEVEL LOW
 
 // Checksum calculation
 uint8_t BusServo_t::CheckSum(uint8_t buf[])
@@ -241,6 +241,11 @@ int BusServo_t::read_angle(uint8_t servo_ID)
 // Read offset
 int BusServo_t::ReadDev(uint8_t id)
 {
+  Serial.println("Reading servo offset...");
+  if (SerialX == nullptr) {
+    Serial.println("DEBUG ERROR: SerialX is NULL!");
+    return -999;
+  }
   int count = 10000;
   int ret;
   uint8_t buf[6];
@@ -251,12 +256,14 @@ int BusServo_t::ReadDev(uint8_t id)
   buf[4] = LOBOT_SERVO_ANGLE_OFFSET_READ;
   buf[5] = CheckSum(buf);
   SerialX->write(buf, 6);
+  SerialX->flush();
   
   delayMicroseconds(500);
   digitalWrite(BUS_EN,READ_LEVEL);
   delay(5);
   
   while (!SerialX->available()) {
+    Serial.println("Waiting for servo response...");
     count -= 1;
     if (count < 0)
     {

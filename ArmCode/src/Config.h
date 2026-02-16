@@ -53,10 +53,12 @@
 
 #define BUS_TX      12
 #define BUS_RX      35
-#define BUS_EN      14
+#define BUS_EN      2
 
 #define RX0_PIN      3
 #define TX0_PIN      1
+#define RX2_PIN      16
+#define TX2_PIN      17
 
 #define ADC_BAT     39
 

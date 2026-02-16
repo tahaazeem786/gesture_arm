@@ -3,6 +3,64 @@
 // Used to save the total action frames in each existing action group
 uint8_t af_sum[ACTION_GROUP_MAX_NUM];	
 
+void scanServos() {
+  Serial.println("\n--- Starting Servo ID Scan ---");
+  Serial.println("Baud Rate: 115200"); // Ensure this matches your Serial1.begin
+  
+  int foundCount = 0;
+
+  for (uint8_t id = 1; id < 255; id++) {
+    // 1. Prepare the "Ping" or "Read Offset" packet
+    uint8_t buf[6];
+    buf[0] = buf[1] = 0x55; // Header
+    buf[2] = id;
+    buf[3] = 3;            // Length
+    buf[4] = 0x1C;         // LOBOT_SERVO_ANGLE_OFFSET_READ (0x1C)
+    
+    // Checksum calculation
+    uint8_t checksum = 0;
+    for (int i = 2; i < 5; i++) checksum += buf[i];
+    buf[5] = ~checksum;
+
+    // 2. Send Packet
+    digitalWrite(BUS_EN, 1); // Ensure we are in WRITE mode (usually LOW)
+    Serial1.write(buf, 6);
+    Serial1.flush();         // CRITICAL: Wait for bits to leave ESP32
+    
+    // 3. Switch to Read Mode
+    digitalWrite(BUS_EN, 0); // Switch to READ mode (usually HIGH)
+    
+    // 4. Wait for response
+    unsigned long start = millis();
+    bool responded = false;
+    
+    while (millis() - start < 20) { // Servos usually respond within 5-10ms
+      if (Serial1.available()) {
+        responded = true;
+        break;
+      }
+    }
+
+    if (responded) {
+      Serial.print("SUCCESS: Found Servo at ID: ");
+      Serial.println(id);
+      foundCount++;
+      // Clear the buffer for the next ID
+      while(Serial1.available()) Serial1.read();
+    } else {
+      // Periodic progress update
+      if (id % 10 == 0) Serial.print("."); 
+    }
+    
+    // Tiny delay before next ID
+    delay(5);
+  }
+
+  Serial.println("\n--- Scan Complete ---");
+  Serial.printf("Total Servos Found: %d\n", foundCount);
+}
+
+
 static float map(float x, float in_min, float in_max, float out_min, float out_max)
 {
     return out_min + (x - in_min) * ((out_max - out_min) / (in_max - in_min));
@@ -503,14 +561,19 @@ uint8_t LeArm_t::read_servo_type(void)
 
 void LeArm_t::init(void)
 {
-	flash_obj.init(); // CORRECT PINS
-	Serial1.begin(115200 ,SERIAL_8N1 , RX0_PIN , TX0_PIN);
-
+	//flash_obj.init(); 
+	Serial.println("Start of Arm Init");
+	delay(100);
+	Serial1.begin(115200 ,SERIAL_8N1 , RX2_PIN , TX2_PIN);
+	delay(100);
 	Serial.println("Serial1 Initialized");
 	delay(100);
 
+	//scanServos();
+
     busservo_obj.init(&Serial1); // this is taking a LONG time
-	servo_type = read_servo_type();
+	//servo_type = read_servo_type();
+	servo_type = 0;
 
 // #if (SERVO_TYPE == TYPE_PWM_SERVO)
 if(servo_type == 0){
@@ -614,6 +677,7 @@ uint8_t LeArm_t::get_servo_type(void)
 // #if (SERVO_TYPE == TYPE_SERIAL_SERVO)
 void LeArm_t::serial_servo_offset_init(void)
 {
+Serial.println("Serial servo offset init...");
 if(servo_type == 1){
 	for(int i = 0; i < 6; i++){
 		bus_servo_offset[i] = busservo_obj.ReadDev(i+1);
