@@ -678,32 +678,20 @@ uint8_t LeArm_t::get_servo_type(void)
 void LeArm_t::serial_servo_offset_init(void)
 {
 Serial.println("Serial servo offset init...");
-uint8_t active_ids[254];
-uint8_t active_count = 0;
 if(servo_type == 1){
-	for(int id = 1; id < 255; id++){
+	for(int id = 1; id < 7; id++){
 		int ret = busservo_obj.ReadDev(id);
 		if (ret != -2048 && ret != -1024) {
-			active_ids[active_count++] = (uint8_t)id;
-			bus_servo_offset[active_count-1] = ret;
-			Serial.printf("Found active servo ID: %d with index: %d at offset: %d\n", id, active_count, ret);
-			active_count++;
+			bus_servo_offset[id] = ret;
+			Serial.printf("Found active servo ID: %d at offset: %d\n", id, ret);
 
-		}
-
-		if (active_count >= 6) {
-			Serial.println("Found all 6 servos");
-			break;
 		}
 	}
 } else {
 	Serial.println("Not a serial servo, skipping offset init.");
 }
 
-if (active_count == 0) {
-	Serial.println("No active servos found during offset init.");
-} else {
-	Serial.printf("Total active servos found: %d\n", active_count);
-}
+
+
 }
 // #endif
