@@ -70,7 +70,7 @@ void setup() {
 
   
 
-  Serial.println("Arm initializing...");
+  //Serial.println("Arm initializing...");
   delay(100);
   // initialize arm first (this sets up Serial1 and servos)
   arm.init();
@@ -92,14 +92,14 @@ void setup() {
   delay(1000);
 
   // quick reset and small motions to verify control
-  arm.reset(800);
-  delay(900);
+  // arm.reset(800);
+  // delay(900);
   arm.claw_set(90.0f, 600);
   delay(700);
-  arm.roll_set(45.0f, 600);
-  delay(700);
-  arm.claw_set(0.0f, 600);
-  delay(700);
+  // arm.roll_set(45.0f, 600);
+  // delay(700);
+  // arm.claw_set(0.0f, 600);
+  // delay(700);
 
   // Initialize control interfaces
   ps2.init();
@@ -113,7 +113,7 @@ void setup() {
   }else{
     buzzer_obj.blink(5000 , 300, 50, 1);
   }
-  Serial.println("begin");
+  // Serial.println("begin");
   delay(1000);
 }
 

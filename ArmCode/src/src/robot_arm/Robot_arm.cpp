@@ -562,18 +562,18 @@ uint8_t LeArm_t::read_servo_type(void)
 void LeArm_t::init(void)
 {
 	//flash_obj.init(); 
-	Serial.println("Start of Arm Init");
+	//Serial.println("Start of Arm Init");
+	//delay(100);
+	Serial1.begin(9600 ,SERIAL_8N1 , RX2_PIN , TX2_PIN);
 	delay(100);
-	Serial1.begin(115200 ,SERIAL_8N1 , RX2_PIN , TX2_PIN);
-	delay(100);
-	Serial.println("Serial1 Initialized");
+	Serial.println("Force UART");
 	delay(100);
 
 	//scanServos();
 
     busservo_obj.init(&Serial1); // this is taking a LONG time
 	//servo_type = read_servo_type();
-	servo_type = 0;
+	servo_type = 1;
 
 // #if (SERVO_TYPE == TYPE_PWM_SERVO)
 if(servo_type == 0){
@@ -678,10 +678,32 @@ uint8_t LeArm_t::get_servo_type(void)
 void LeArm_t::serial_servo_offset_init(void)
 {
 Serial.println("Serial servo offset init...");
+uint8_t active_ids[254];
+uint8_t active_count = 0;
 if(servo_type == 1){
-	for(int i = 0; i < 6; i++){
-		bus_servo_offset[i] = busservo_obj.ReadDev(i+1);
+	for(int id = 1; id < 255; id++){
+		int ret = busservo_obj.ReadDev(id);
+		if (ret != -2048 && ret != -1024) {
+			active_ids[active_count++] = (uint8_t)id;
+			bus_servo_offset[active_count-1] = ret;
+			Serial.printf("Found active servo ID: %d with index: %d at offset: %d\n", id, active_count, ret);
+			active_count++;
+
+		}
+
+		if (active_count >= 6) {
+			Serial.println("Found all 6 servos");
+			break;
+		}
 	}
+} else {
+	Serial.println("Not a serial servo, skipping offset init.");
+}
+
+if (active_count == 0) {
+	Serial.println("No active servos found during offset init.");
+} else {
+	Serial.printf("Total active servos found: %d\n", active_count);
 }
 }
 // #endif

@@ -6,7 +6,7 @@
 #define TYPE_PWM_SERVO		1
 #define TYPE_SERIAL_SERVO	2
 /* Robot arm servo type selection */
-#define SERVO_TYPE			TYPE_PWM_SERVO
+#define SERVO_TYPE			TYPE_SERIAL_SERVO
 
 // arm.coordinate_set(15,0,2,0,-90,90,1000);
 #if (SERVO_TYPE == TYPE_PWM_SERVO)
@@ -45,8 +45,8 @@
 #define SERVO_5   0
 #define SERVO_6   15
 
-#define IIC_SDA     17
-#define IIC_SCL     16
+#define IIC_SDA     21
+#define IIC_SCL     22
 
 #define BLE_TX      1
 #define BLE_RX      3
@@ -73,7 +73,7 @@
 #define FLASH_CLK   23
 #define FLASH_DI    22
 #define FLASH_DO    21
-#define FLASH_CS    2
+#define FLASH_CS    5
 
 #define IO_BLE_CTL  25
 

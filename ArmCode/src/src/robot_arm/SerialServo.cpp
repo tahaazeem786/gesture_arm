@@ -246,7 +246,7 @@ int BusServo_t::ReadDev(uint8_t id)
     Serial.println("DEBUG ERROR: SerialX is NULL!");
     return -999;
   }
-  int count = 10000;
+  int count = 5;
   int ret;
   uint8_t buf[6];
 
@@ -258,16 +258,18 @@ int BusServo_t::ReadDev(uint8_t id)
   SerialX->write(buf, 6);
   SerialX->flush();
   
-  delayMicroseconds(500);
-  digitalWrite(BUS_EN,READ_LEVEL);
-  delay(5);
+  delayMicroseconds(1000);
+  // digitalWrite(BUS_EN,READ_LEVEL);
+  // delay(5);
   
   while (!SerialX->available()) {
-    Serial.println("Waiting for servo response...");
+    Serial.printf("Waiting for servo %d response...", id);
     count -= 1;
     if (count < 0)
     {
-      digitalWrite(BUS_EN,WRITE_LEVEL);
+      Serial.printf("ERROR: No response from servo %d. Timeout.\n", id);
+      Serial.flush();
+      // digitalWrite(BUS_EN,WRITE_LEVEL);
       return -2048;
     }
     delay(5);
@@ -278,7 +280,7 @@ int BusServo_t::ReadDev(uint8_t id)
   }else{
     ret = -1024;
   }
-  digitalWrite(BUS_EN,WRITE_LEVEL);
+  // digitalWrite(BUS_EN,WRITE_LEVEL);
   return ret;
 }
 

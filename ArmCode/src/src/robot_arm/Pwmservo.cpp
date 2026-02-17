@@ -95,6 +95,7 @@ void PwmServo_t::init(void)
   /* Read PWM servo offsets (not implemented) */
 
   for (int i = 0; i < SERVO_NUM; ++i) {
+    Serial.println("Attaching servo on pin " + String(pwm_servos[i].pin_id));
     servos[i].attach(pwm_servos[i].pin_id);
     servos[i].writeMicroseconds(pwm_servos[i].actual_pulsewidth);
   }
