@@ -166,8 +166,11 @@ void loop() {
     // get imu data
     float gx, gy, gz;
     gx, gy, gz = mpuTranslateData();
+    Serial.printf("% 8.3fX   % 8.3fY   % 8.3fZ \n",
+                gx, gy, gz);
 
     // translate imu data to servo positions
+
 
 
 
