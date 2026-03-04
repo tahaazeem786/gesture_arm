@@ -204,6 +204,8 @@ void loop() {
     if (pos5 < 0) pos5 = 0;
     if (pos4 > 1000) pos4 = 1000;
     if (pos4 < 0) pos4 = 0;
+
+    // mess with pos2 and 3 tuning for claw positioning
     if (pos3 > 1000) pos3 = 1000;
     if (pos3 < 0) pos3 = 0;
     if (pos2 > 1000) pos2 = 1000;
