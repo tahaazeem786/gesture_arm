@@ -176,9 +176,9 @@ void loop() {
     // get imu data
     float gx, gy, gz;
     gx, gy, gz = mpuTranslateData();
-    Serial.printf("% 8.3fX   % 8.3fY   % 8.3fZ \n",
+    Serial.printf("Accel: % 8.3fX   % 8.3fY   % 8.3fZ \n",
                 gx, gy, gz);
-
+    
     // translate imu data to servo positions
     // if X, then id 6 plus 100
     if(gx > 0.5) {
@@ -207,7 +207,8 @@ void loop() {
 
     // HOW ARE WE MAPPING CLAW??
 
-
+    Serial.printf("POS: 1:%d   2:%d   3:%d   4:%d   5:%d   6:%d \n",
+                pos1, pos2, pos3, pos4, pos5, pos6);
     
     sendMove((uint8_t)1, pos1);
     sendMove((uint8_t)2, pos2);
