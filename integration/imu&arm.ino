@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <Wire.h>
+
 HardwareSerial armSerial(1);
 
 static const int ARM_RX = 16;
@@ -6,6 +8,23 @@ static const int ARM_TX = 17;
 
 static uint16_t moveTime = 800;
 
+// ── MPU-6050 ──────────────────────────────────────────────────────────────────
+#define MPU_ADDR      0x68   // ADO=GND → 0x68
+#define REG_WHO_AM_I  0x75
+#define REG_PWR_MGMT  0x6B
+#define REG_ACCEL_X_H 0x3B   // accel X/Y/Z are 6 consecutive bytes from here
+
+// ── Flex sensor ───────────────────────────────────────────────────────────────
+#define FLEX_PIN      34     // GPIO 34: input-only, good ADC pin
+#define ADC_MAX       4095   // ESP32 ADC is 12-bit
+#define VCC           3.3f
+
+// 10kOhm pull-down resistor in the voltage divider
+#define R_DIVIDER     10000.0f
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SERVO CONTOL PROTOCOL:
 // Protocol: 55 55 LEN CMD COUNT TIME_L TIME_H [ID POS_L POS_H]...
 // Where LEN = total bytes from LEN through end (INCLUDING LEN itself).
 // For count=1: LEN = 5 + 3*1 = 8  (matches your working packet)
@@ -72,50 +91,85 @@ void resetAllSequential() {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+
+// IMU helper functions (MPU-6050)
+
+void mpuWrite(uint8_t reg, uint8_t val) {
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(reg);
+  Wire.write(val);
+  Wire.endTransmission();
+}
+
+void mpuRead(uint8_t reg, uint8_t *buf, uint8_t len) {
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(reg);
+  Wire.endTransmission(false);          // keep bus active
+  Wire.requestFrom((uint8_t)MPU_ADDR, len);
+  for (uint8_t i = 0; i < len && Wire.available(); i++) {
+    buf[i] = Wire.read();
+  }
+}
+
+void mpuSetup() {
+    Wire.begin(21, 22);   // SDA=21, SCL=22
+
+    Wire.beginTransmission(MPU_ADDR);
+    uint8_t err = Wire.endTransmission();
+    if (err != 0) {
+        Serial.printf("ERROR: No I2C device found at 0x%02X (Wire error %d)\n",
+                    MPU_ADDR, err);
+        Serial.println("Check wiring. Halting.");
+        while (true) delay(1000);
+    }
+
+    mpuWrite(REG_PWR_MGMT, 0x00);
+    delay(100);
+}
+
+void mpuTranslateData() {
+    uint8_t raw[6];
+    mpuRead(REG_ACCEL_X_H, raw, 6);
+
+    int16_t ax = (int16_t)((raw[0] << 8) | raw[1]);
+    int16_t ay = (int16_t)((raw[2] << 8) | raw[3]);
+    int16_t az = (int16_t)((raw[4] << 8) | raw[5]);
+
+    // Default full-scale range is ±2g → 16384 LSB/g
+    float gx = ax / 16384.0f;
+    float gy = ay / 16384.0f;
+    float gz = az / 16384.0f;
+
+    return gx, gy, gz;
+}
+
+
+
 void setup() {
-  Serial.begin(115200);
-  delay(1500);
+  
+    // ARM SETUP
+    Serial.begin(115200);
+    delay(1500);
 
-  armSerial.begin(9600, SERIAL_8N1, ARM_RX, ARM_TX);
-  delay(200);
+    armSerial.begin(9600, SERIAL_8N1, ARM_RX, ARM_TX);
+    delay(200);
 
-  Serial.println("\nLeArm Ready");
+    Serial.println("\nLeArm Ready");
  
+
+    // IMU SETUP
+    mpuSetup();
 }
 
 void loop() {
-  String line = readLine();
-  if (line.length() == 0) return;
+    // get imu data
+    float gx, gy, gz;
+    gx, gy, gz = mpuTranslateData();
 
-  if (line == "reset") {
-    resetAll();
-    return;
-  }
-  if (line == "reset_seq") {
-    resetAllSequential();
-    return;
-  }
-  if (line.startsWith("t ")) {
-    int ms = line.substring(2).toInt();
-    ms = constrain(ms, 0, 10000);
-    moveTime = (uint16_t)ms;
-    Serial.print("Move time set to ");
-    Serial.println(moveTime);
-    return;
-  }
+    // translate imu data to servo positions
 
-  int sp = line.indexOf(' ');
-  if (sp < 0) {
-    Serial.println("Bad format. Try: 1 800 or reset");
-    return;
-  }
 
-  int id = line.substring(0, sp).toInt();
-  int pos = line.substring(sp + 1).toInt();
-  if (id < 1 || id > 6) {
-    Serial.println("Servo id must be 1..6");
-    return;
-  }
 
-  sendMove((uint8_t)id, (uint16_t)pos);
+    sendMove((uint8_t)id, (uint16_t)pos);
 }
