@@ -175,18 +175,18 @@ void loop() {
     // translate imu data to servo positions
     // if X, then id 6 plus 100
     if(gx > 0.4) {
-        pos6 = pos6 + 100;
-    } else if (gx < -0.5) {
         pos6 = pos6 - 100;
+    } else if (gx < -0.5) {
+        pos6 = pos6 + 100;
     }
 
     // if Y, then id 5 and 4 plus 100
     if(gy > 0.4) {
-        pos4 = pos4 + 100;
-        pos5 = pos5 + 100;
-    } else if (gy < -0.4) {
-        pos5 = pos5 - 100;
         pos4 = pos4 - 100;
+        pos5 = pos5 - 100;
+    } else if (gy < -0.4) {
+        pos5 = pos5 + 100;
+        pos4 = pos4 + 100;
     }
 
     // if Z, then id 3 and 2 plus 100
