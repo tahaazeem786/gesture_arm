@@ -197,16 +197,16 @@ void loop() {
 
     if (pos6 > 1000) pos6 = 1000;
     if (pos6 < 0) pos6 = 0;
-    if (pos5 > 1000) pos6 = 1000;
-    if (pos5 < 0) pos6 = 0;
-    if (pos4 > 1000) pos6 = 1000;
-    if (pos4 < 0) pos6 = 0;
-    if (pos3 > 1000) pos6 = 1000;
-    if (pos3 < 0) pos6 = 0;
-    if (pos2 > 1000) pos6 = 1000;
-    if (pos2 < 0) pos6 = 0;
-    if (pos1 > 1000) pos6 = 1000;
-    if (pos1 < 0) pos6 = 0;
+    if (pos5 > 1000) pos5 = 1000;
+    if (pos5 < 0) pos5 = 0;
+    if (pos4 > 1000) pos4 = 1000;
+    if (pos4 < 0) pos4 = 0;
+    if (pos3 > 1000) pos3 = 1000;
+    if (pos3 < 0) pos3 = 0;
+    if (pos2 > 1000) pos2 = 1000;
+    if (pos2 < 0) pos2 = 0;
+    if (pos1 > 1000) pos1 = 1000;
+    if (pos1 < 0) pos1 = 0;
 
     // HOW ARE WE MAPPING CLAW??
 
