@@ -190,12 +190,12 @@ void loop() {
     }
 
     // if Z, then id 3 and 2 plus 100
-    if(gz > 1.2) {
-        pos3 = pos3 + 100;
-        pos2 = pos2 + 100;
-    } else if (gz < 0.8) {
+    if(gz > 1.0) {
         pos3 = pos3 - 100;
         pos2 = pos2 - 100;
+    } else if (gz < 0.8) {
+        pos3 = pos3 + 100;
+        pos2 = pos2 + 100;
     }
 
     if (pos6 > 1000) pos6 = 1000;
