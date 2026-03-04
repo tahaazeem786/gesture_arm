@@ -22,6 +22,7 @@ static uint16_t moveTime = 800;
 // 10kOhm pull-down resistor in the voltage divider
 #define R_DIVIDER     10000.0f
 
+uint16_t pos1 = 500, pos2 = 500, pos3 = 500, pos4 = 500, pos5 = 500, pos6 = 500;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SERVO CONTOL PROTOCOL:
@@ -128,7 +129,8 @@ void mpuSetup() {
     delay(100);
 }
 
-void mpuTranslateData() {
+// Change the function to return void, but take pointers or references
+void mpuTranslateData(float &gx, float &gy, float &gz) {
     uint8_t raw[6];
     mpuRead(REG_ACCEL_X_H, raw, 6);
 
@@ -136,12 +138,9 @@ void mpuTranslateData() {
     int16_t ay = (int16_t)((raw[2] << 8) | raw[3]);
     int16_t az = (int16_t)((raw[4] << 8) | raw[5]);
 
-    // Default full-scale range is ±2g → 16384 LSB/g
-    float gx = ax / 16384.0f;
-    float gy = ay / 16384.0f;
-    float gz = az / 16384.0f;
-
-    return gx, gy, gz;
+    gx = ax / 16384.0f;
+    gy = ay / 16384.0f;
+    gz = az / 16384.0f;
 }
 
 
@@ -161,21 +160,12 @@ void setup() {
     // IMU SETUP
     mpuSetup();
 
-
-    // Servo Positions
-    uint16_t pos1 = 500;
-    uint16_t pos2 = 500;
-    uint16_t pos3 = 500;
-    uint16_t pos4 = 500;
-    uint16_t pos5 = 500;
-    uint16_t pos6 = 500;
-
 }
 
 void loop() {
     // get imu data
     float gx, gy, gz;
-    gx, gy, gz = mpuTranslateData();
+    mpuTranslateData(gx, gy, gz);
     Serial.printf("Accel: % 8.3fX   % 8.3fY   % 8.3fZ \n",
                 gx, gy, gz);
     
