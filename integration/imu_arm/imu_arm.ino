@@ -22,7 +22,7 @@ static uint16_t moveTime = 800;
 // 10kOhm pull-down resistor in the voltage divider
 #define R_DIVIDER     10000.0f
 
-uint16_t pos1 = 500, pos2 = 500, pos3 = 500, pos4 = 500, pos5 = 500, pos6 = 500;
+int16_t pos1 = 500, pos2 = 500, pos3 = 500, pos4 = 500, pos5 = 500, pos6 = 500;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SERVO CONTOL PROTOCOL:
@@ -53,7 +53,7 @@ void sendMultiMove(uint8_t count, const uint8_t* ids, const uint16_t* positions)
   }
 
   armSerial.write(frame, idx);
-  delaymicroseconds(100);
+  delay(100);
 }
 
 void sendMove(uint8_t id, uint16_t pos) {
@@ -181,10 +181,10 @@ void loop() {
     }
 
     // if Y, then id 5 and 4 plus 100
-    if(gx > 0.4) {
+    if(gy > 0.4) {
         pos4 = pos4 + 100;
         pos5 = pos5 + 100;
-    } else if (gx < -0.4) {
+    } else if (gy < -0.4) {
         pos5 = pos5 - 100;
         pos4 = pos4 - 100;
     }
