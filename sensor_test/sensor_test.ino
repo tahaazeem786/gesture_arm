@@ -58,6 +58,8 @@ void setup() {
   delay(500);
   Serial.println("\n=== sensor_test booting ===");
 
+  analogSetPinAttenuation(FLEX_PIN, ADC_11db);
+
   // Start I2C on the correct pins for this wiring
   Wire.begin(21, 22);   // SDA=21, SCL=22
 
