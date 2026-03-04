@@ -147,7 +147,7 @@ void mpuTranslateData() {
 
 
 void setup() {
-  
+    
     // ARM SETUP
     Serial.begin(115200);
     delay(1500);
@@ -160,6 +160,16 @@ void setup() {
 
     // IMU SETUP
     mpuSetup();
+
+
+    // Servo Positions
+    uint16_t pos1 = 500;
+    uint16_t pos2 = 500;
+    uint16_t pos3 = 500;
+    uint16_t pos4 = 500;
+    uint16_t pos5 = 500;
+    uint16_t pos6 = 500;
+
 }
 
 void loop() {
@@ -170,9 +180,39 @@ void loop() {
                 gx, gy, gz);
 
     // translate imu data to servo positions
+    // if X, then id 6 plus 100
+    if(gx > 0.5) {
+        pos6 = pos6 + 100;
+    } else if (gx < -0.5) {
+        pos6 = pos6 - 100;
+    }
+
+    // if Y, then id 5 and 4 plus 100
+    if(gx > 0.5) {
+        pos4 = pos4 + 100;
+        pos5 = pos5 + 100;
+    } else if (gx < -0.5) {
+        pos5 = pos5 - 100;
+        pos4 = pos4 - 100;
+    }
+
+    // if Z, then id 3 and 2 plus 100
+    if(gz > 0.5) {
+        pos3 = pos3 + 100;
+        pos2 = pos2 + 100;
+    } else if (gz < -0.5) {
+        pos3 = pos3 - 100;
+        pos2 = pos2 - 100;
+    }
+
+    // HOW ARE WE MAPPING CLAW??
 
 
-
-
-    sendMove((uint8_t)id, (uint16_t)pos);
+    
+    sendMove((uint8_t)1, pos1);
+    sendMove((uint8_t)2, pos2);
+    sendMove((uint8_t)3, pos3);
+    sendMove((uint8_t)4, pos4);
+    sendMove((uint8_t)5, pos5);
+    sendMove((uint8_t)6, pos6);
 }
