@@ -53,6 +53,7 @@ void sendMultiMove(uint8_t count, const uint8_t* ids, const uint16_t* positions)
   }
 
   armSerial.write(frame, idx);
+  delaymicroseconds(100);
 }
 
 void sendMove(uint8_t id, uint16_t pos) {
@@ -164,6 +165,8 @@ void setup() {
 
 void loop() {
     // get imu data
+
+    // default vals x -0.13, y -0.08, z 1.01
     float gx, gy, gz;
     mpuTranslateData(gx, gy, gz);
     Serial.printf("Accel: % 8.3fX   % 8.3fY   % 8.3fZ \n",
@@ -171,26 +174,26 @@ void loop() {
     
     // translate imu data to servo positions
     // if X, then id 6 plus 100
-    if(gx > 0.5) {
+    if(gx > 0.4) {
         pos6 = pos6 + 100;
     } else if (gx < -0.5) {
         pos6 = pos6 - 100;
     }
 
     // if Y, then id 5 and 4 plus 100
-    if(gx > 0.5) {
+    if(gx > 0.4) {
         pos4 = pos4 + 100;
         pos5 = pos5 + 100;
-    } else if (gx < -0.5) {
+    } else if (gx < -0.4) {
         pos5 = pos5 - 100;
         pos4 = pos4 - 100;
     }
 
     // if Z, then id 3 and 2 plus 100
-    if(gz > 1) {
+    if(gz > 1.2) {
         pos3 = pos3 + 100;
         pos2 = pos2 + 100;
-    } else if (gz < -1) {
+    } else if (gz < 0.8) {
         pos3 = pos3 - 100;
         pos2 = pos2 - 100;
     }
