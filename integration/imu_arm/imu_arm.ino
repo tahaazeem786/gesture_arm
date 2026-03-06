@@ -24,7 +24,7 @@ static uint16_t moveTime = 800;
 #define R_DIVIDER     10000.0f
 
 int16_t pos1 = 500, pos2 = 500, pos3 = 500, pos4 = 500, pos5 = 500, pos6 = 500;
-int8_t flexADC = 0, pushADC = 0; // 0=unflexed, 1=flexe
+uint8_t flexADC = 0, pushADC = 0; // 0=unflexed, 1=flexe
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SERVO CONTOL PROTOCOL:
@@ -239,9 +239,9 @@ void loop() {
 
 
   // if push button, then toggle between 1000 and 0 on id 1
-  if (pushADC > 1300 && pos1 < 500) {
-      pos1 = 1000;
-  } else if (pushADC > 1300 && pos1 > 500) {
+  if (pushADC > 500 && pos1 < 500) {
+      pos1 = 600;
+  } else if (pushADC > 500 && pos1 > 500) {
       pos1 = 0;
   }
 
