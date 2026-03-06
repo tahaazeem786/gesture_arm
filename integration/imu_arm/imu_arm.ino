@@ -235,25 +235,7 @@ void loop() {
       pos3 = pos3 + 100;
     }
   }
-  
-  // translate imu data to servo positions
-  // if X, then id 6 plus 100
-  
 
-  // if Z, then id 3 and 2 plus 100
-  if(gz > 1.0) {
-      pos3 = pos3 - 100;
-      pos2 = pos2 - 100;
-  } else if (gz < 0.8) {
-      pos3 = pos3 + 100;
-      pos2 = pos2 + 100;
-  }
-
-  if (flexADC < 30) {
-      pos1 = pos1 + 100;
-  } else if (flexADC > 80) {
-      pos1 = pos1 - 100;
-  }
 
 
   // if push button, then toggle between 1000 and 0 on id 1
