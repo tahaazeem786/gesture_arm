@@ -188,6 +188,7 @@ void setup() {
 
 void loop() {
   // get imu data
+  static int pos1Lockdebouout = 0;
 
   // default vals x -0.13, y -0.08, z 1.01
   float gx, gy, gz;
@@ -240,13 +241,17 @@ void loop() {
     }
   }
 
-
+  if (pos1Lockout > 0) {
+    pos1Lockout--;
+  }
 
   // if push button, then toggle between 1000 and 0 on id 1
   if (pushADC > 50 && pos1 <= 500) {
-      pos1 = 600;
+      pos1 = 700; // CLOSED
+      pos1lockout = 250;
   } else if (pushADC > 50 && pos1 >= 500) {
-      pos1 = 0;
+      pos1 = 0;  // OPEN
+      post1lockout = 250;
   }
 
   if (pos6 > 1000) pos6 = 1000;
