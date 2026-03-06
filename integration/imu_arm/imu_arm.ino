@@ -151,8 +151,8 @@ void readFlexSensor(uint8_t &flexADC) {
     flexADC = analogRead(FLEX_PIN);
     float voltage = (flexADC / (float)ADC_MAX) * VCC;
     float flexResistance = (R_DIVIDER * voltage) / (VCC - voltage);
-    Serial.printf("Flex Sensor: ADC=%d  Voltage=%.2fV  Resistance=%.1fΩ\n",
-                flexADC, voltage, flexResistance);
+    //Serial.printf("Flex Sensor: ADC=%d  Voltage=%.2fV  Resistance=%.1fΩ\n",
+    //            flexADC, voltage, flexResistance);
 
 
     // ADC sits from 60-90 when unflexed, goes to 0 or ~140 when flexed.
@@ -161,8 +161,8 @@ void readFlexSensor(uint8_t &flexADC) {
 void readPushButton(uint8_t &pushADC) {
     pushADC = analogRead(PUSH_PIN);
     float voltage = (pushADC / (float)ADC_MAX) * VCC;
-    Serial.printf("Push Button: ADC=%d  Voltage=%.2fV\n",
-                pushADC, voltage);
+    //Serial.printf("Push Button: ADC=%d  Voltage=%.2fV\n",
+    //            pushADC, voltage);
 
 
     // ADC sits from 1690 when pushed
@@ -194,28 +194,29 @@ void loop() {
   mpuTranslateData(gx, gy, gz);
   readFlexSensor(flexADC);
   readPushButton(pushADC);
-  Serial.printf("Accel: % 8.3fX   % 8.3fY   % 8.3fZ \n",
-              gx, gy, gz);
   
   
+  Serial.printf("Flex ADC: %d   Push ADC: %d \n",
+              flexADC, pushADC);
+
   
-  if(flexADC < 90 || flexADC > 60) {
+  if(flexADC < 90 || flexADC > 50) {
     // unflexed, control 6,5,4 with X,Y
 
     // X CONTROL WHEN UNFLEXED
     if(gx > 0.4) {
       pos6 = pos6 - 100;
     } else if (gx < -0.5) {
-        pos6 = pos6 + 100;
+      pos6 = pos6 + 100;
     }
 
     // Y CONTROL WHEN UNFLEXED
     if(gy > 0.4) {
-        pos4 = pos4 - 100;
-        pos5 = pos5 - 100;
+      pos4 = pos4 - 100;
+      pos5 = pos5 - 100;
     } else if (gy < -0.4) {
-        pos5 = pos5 + 100;
-        pos4 = pos4 + 100;
+      pos5 = pos5 + 100;
+      pos4 = pos4 + 100;
     }
 
   } else {
@@ -239,9 +240,9 @@ void loop() {
 
 
   // if push button, then toggle between 1000 and 0 on id 1
-  if (pushADC > 500 && pos1 < 500) {
+  if (pushADC > 50 && pos1 <= 500) {
       pos1 = 600;
-  } else if (pushADC > 500 && pos1 > 500) {
+  } else if (pushADC > 50 && pos1 >= 500) {
       pos1 = 0;
   }
 
