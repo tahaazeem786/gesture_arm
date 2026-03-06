@@ -5,6 +5,7 @@ HardwareSerial armSerial(1);
 
 #define ARM_RX 16
 #define ARM_TX 17
+#define PUSH_PIN 39
 
 static uint16_t moveTime = 800;
 
@@ -151,6 +152,19 @@ void readFlexSensor() {
     float flexResistance = (R_DIVIDER * voltage) / (VCC - voltage);
     Serial.printf("Flex Sensor: ADC=%d  Voltage=%.2fV  Resistance=%.1fΩ\n",
                 adcVal, voltage, flexResistance);
+
+
+    // ADC sits from 60-90 when unflexed, goes to 0 or ~140 when flexed.
+}
+
+void readPushButton() {
+    int adcVal = analogRead(PUSH_PIN);
+    float voltage = (adcVal / (float)ADC_MAX) * VCC;
+    Serial.printf("Push Button: ADC=%d  Voltage=%.2fV\n",
+                adcVal, voltage);
+
+
+    // ADC sits from 60-90 when unflexed, goes to 0 or ~140 when flexed.
 }
 
 
@@ -224,8 +238,9 @@ void loop() {
     // HOW ARE WE MAPPING CLAW??
 
     readFlexSensor();
+    readPushButton();
 
-    
+
     Serial.printf("POS: 1:%d   2:%d   3:%d   4:%d   5:%d   6:%d \n",
                 pos1, pos2, pos3, pos4, pos5, pos6);
     
