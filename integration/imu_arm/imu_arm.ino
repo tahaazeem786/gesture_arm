@@ -200,8 +200,9 @@ void loop() {
               flexADC, pushADC);
 
   
-  if(flexADC < 90 || flexADC > 50) {
+  if(flexADC < 90 && flexADC > 40) {
     // unflexed, control 6,5,4 with X,Y
+    Serial.printf("in unflexed state \n");
 
     // X CONTROL WHEN UNFLEXED
     if(gx > 0.4) {
@@ -221,6 +222,7 @@ void loop() {
 
   } else {
     // flexed, control 2,3 with X,Y
+    Serial.printf("in flexed state \n");
 
     // X CONTROL WHEN FLEXED
     if(gx > 0.4) {
