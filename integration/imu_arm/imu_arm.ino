@@ -198,13 +198,12 @@ void loop() {
   
   Serial.printf("IMU: gx=%.2f  gy=%.2f  \n",
               gx, gy);
-  Serial.printf("Flex ADC: %d   Push ADC: %d \n",
-              flexADC, pushADC);
+  Serial.printf("Flex ADC: %d   Push ADC: %d   Lockout: %d\n",
+              flexADC, pushADC, pos1Lockout);
 
   
   if(flexADC < 90 && flexADC > 40) {
     // unflexed, control 6,5,4 with X,Y
-    Serial.printf("in unflexed state \n");
 
     // X CONTROL WHEN UNFLEXED
     if(gx > 0.4) {
@@ -224,7 +223,6 @@ void loop() {
 
   } else {
     // flexed, control 2,3 with X,Y
-    Serial.printf("in flexed state \n");
 
     // X CONTROL WHEN FLEXED
     if(gx > 0.4) {
@@ -248,10 +246,10 @@ void loop() {
   // if push button, then toggle between 1000 and 0 on id 1
   if (pushADC > 50 && pos1 <= 500 && pos1Lockout == 0) {
       pos1 = 700; // CLOSED
-      pos1Lockout = 250;
+      pos1Lockout = 5;
   } else if (pushADC > 50 && pos1 >= 500 && pos1Lockout == 0) {
       pos1 = 0;  // OPEN
-      pos1Lockout = 250;
+      pos1Lockout = 5;
   }
 
   if (pos6 > 1000) pos6 = 1000;
