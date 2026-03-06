@@ -3,8 +3,8 @@
 
 HardwareSerial armSerial(1);
 
-static const int ARM_RX = 16;
-static const int ARM_TX = 17;
+#define ARM_RX 16
+#define ARM_TX 17
 
 static uint16_t moveTime = 800;
 
@@ -15,7 +15,7 @@ static uint16_t moveTime = 800;
 #define REG_ACCEL_X_H 0x3B   // accel X/Y/Z are 6 consecutive bytes from here
 
 // ── Flex sensor ───────────────────────────────────────────────────────────────
-#define FLEX_PIN      34     // GPIO 34: input-only, good ADC pin
+#define FLEX_PIN      36     // GPIO 36: input-only, good ADC pin
 #define ADC_MAX       4095   // ESP32 ADC is 12-bit
 #define VCC           3.3f
 
@@ -145,6 +145,14 @@ void mpuTranslateData(float &gx, float &gy, float &gz) {
 }
 
 
+void readFlexSensor() {
+    int adcVal = analogRead(FLEX_PIN);
+    float voltage = (adcVal / (float)ADC_MAX) * VCC;
+    float flexResistance = (R_DIVIDER * voltage) / (VCC - voltage);
+    Serial.printf("Flex Sensor: ADC=%d  Voltage=%.2fV  Resistance=%.1fΩ\n",
+                adcVal, voltage, flexResistance);
+}
+
 
 void setup() {
     
@@ -215,6 +223,9 @@ void loop() {
 
     // HOW ARE WE MAPPING CLAW??
 
+    readFlexSensor();
+
+    
     Serial.printf("POS: 1:%d   2:%d   3:%d   4:%d   5:%d   6:%d \n",
                 pos1, pos2, pos3, pos4, pos5, pos6);
     
