@@ -24,6 +24,7 @@ static uint16_t moveTime = 800;
 #define R_DIVIDER     10000.0f
 
 int16_t pos1 = 500, pos2 = 500, pos3 = 500, pos4 = 500, pos5 = 500, pos6 = 500;
+int8_t flexADC = 0, pushADC = 0; // 0=unflexed, 1=flexe
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SERVO CONTOL PROTOCOL:
@@ -146,25 +147,25 @@ void mpuTranslateData(float &gx, float &gy, float &gz) {
 }
 
 
-void readFlexSensor() {
-    int adcVal = analogRead(FLEX_PIN);
-    float voltage = (adcVal / (float)ADC_MAX) * VCC;
+void readFlexSensor(int8_t &flexADC) {
+    flexADC = analogRead(FLEX_PIN);
+    float voltage = (flexADC / (float)ADC_MAX) * VCC;
     float flexResistance = (R_DIVIDER * voltage) / (VCC - voltage);
     Serial.printf("Flex Sensor: ADC=%d  Voltage=%.2fV  Resistance=%.1fΩ\n",
-                adcVal, voltage, flexResistance);
+                flexADC, voltage, flexResistance);
 
 
     // ADC sits from 60-90 when unflexed, goes to 0 or ~140 when flexed.
 }
 
-void readPushButton() {
-    int adcVal = analogRead(PUSH_PIN);
-    float voltage = (adcVal / (float)ADC_MAX) * VCC;
+void readPushButton(int8_t &pushADC) {
+    pushADC = analogRead(PUSH_PIN);
+    float voltage = (pushADC / (float)ADC_MAX) * VCC;
     Serial.printf("Push Button: ADC=%d  Voltage=%.2fV\n",
-                adcVal, voltage);
+                pushADC, voltage);
 
 
-    // ADC sits from 60-90 when unflexed, goes to 0 or ~140 when flexed.
+    // ADC sits from 1690 when pushed
 }
 
 
@@ -186,23 +187,29 @@ void setup() {
 }
 
 void loop() {
-    // get imu data
+  // get imu data
 
-    // default vals x -0.13, y -0.08, z 1.01
-    float gx, gy, gz;
-    mpuTranslateData(gx, gy, gz);
-    Serial.printf("Accel: % 8.3fX   % 8.3fY   % 8.3fZ \n",
-                gx, gy, gz);
-    
-    // translate imu data to servo positions
-    // if X, then id 6 plus 100
+  // default vals x -0.13, y -0.08, z 1.01
+  float gx, gy, gz;
+  mpuTranslateData(gx, gy, gz);
+  readFlexSensor(flexADC);
+  readPushButton(pushADC);
+  Serial.printf("Accel: % 8.3fX   % 8.3fY   % 8.3fZ \n",
+              gx, gy, gz);
+  
+  
+  
+  if(flexADC < 90 || flexADC > 60) {
+    // unflexed, control 6,5,4 with X,Y
+
+    // X CONTROL WHEN UNFLEXED
     if(gx > 0.4) {
-        pos6 = pos6 - 100;
+      pos6 = pos6 - 100;
     } else if (gx < -0.5) {
         pos6 = pos6 + 100;
     }
 
-    // if Y, then id 5 and 4 plus 100
+    // Y CONTROL WHEN UNFLEXED
     if(gy > 0.4) {
         pos4 = pos4 - 100;
         pos5 = pos5 - 100;
@@ -211,43 +218,76 @@ void loop() {
         pos4 = pos4 + 100;
     }
 
-    // if Z, then id 3 and 2 plus 100
-    if(gz > 1.0) {
-        pos3 = pos3 - 100;
-        pos2 = pos2 - 100;
-    } else if (gz < 0.8) {
-        pos3 = pos3 + 100;
-        pos2 = pos2 + 100;
+  } else {
+    // flexed, control 2,3 with X,Y
+
+    // X CONTROL WHEN FLEXED
+    if(gx > 0.4) {
+      pos2 = pos2 - 100;
+    } else if (gx < -0.5) {
+      pos2 = pos2 + 100;
     }
 
-    if (pos6 > 1000) pos6 = 1000;
-    if (pos6 < 0) pos6 = 0;
-    if (pos5 > 1000) pos5 = 1000;
-    if (pos5 < 0) pos5 = 0;
-    if (pos4 > 1000) pos4 = 1000;
-    if (pos4 < 0) pos4 = 0;
+    // Y CONTROL WHEN FLEXED
+    if(gy > 0.4) {
+      pos3 = pos3 - 100;
+    } else if (gy < -0.4) {
+      pos3 = pos3 + 100;
+    }
+  }
+  
+  // translate imu data to servo positions
+  // if X, then id 6 plus 100
+  
 
-    // mess with pos2 and 3 tuning for claw positioning
-    if (pos3 > 1000) pos3 = 1000;
-    if (pos3 < 0) pos3 = 0;
-    if (pos2 > 1000) pos2 = 1000;
-    if (pos2 < 0) pos2 = 0;
-    if (pos1 > 1000) pos1 = 1000;
-    if (pos1 < 0) pos1 = 0;
+  // if Z, then id 3 and 2 plus 100
+  if(gz > 1.0) {
+      pos3 = pos3 - 100;
+      pos2 = pos2 - 100;
+  } else if (gz < 0.8) {
+      pos3 = pos3 + 100;
+      pos2 = pos2 + 100;
+  }
 
-    // HOW ARE WE MAPPING CLAW??
+  if (flexADC < 30) {
+      pos1 = pos1 + 100;
+  } else if (flexADC > 80) {
+      pos1 = pos1 - 100;
+  }
 
-    readFlexSensor();
-    readPushButton();
+
+  // if push button, then toggle between 1000 and 0 on id 1
+  if (pushADC > 1300 && pos1 < 500) {
+      pos1 = 1000;
+  } else if (pushADC > 1300 && pos1 > 500) {
+      pos1 = 0;
+  }
+
+  if (pos6 > 1000) pos6 = 1000;
+  if (pos6 < 0) pos6 = 0;
+  if (pos5 > 1000) pos5 = 1000;
+  if (pos5 < 0) pos5 = 0;
+  if (pos4 > 1000) pos4 = 1000;
+  if (pos4 < 0) pos4 = 0;
+
+  // mess with pos2 and 3 tuning for claw positioning
+  if (pos3 > 1000) pos3 = 1000;
+  if (pos3 < 0) pos3 = 0;
+  if (pos2 > 1000) pos2 = 1000;
+  if (pos2 < 0) pos2 = 0;
+  if (pos1 > 1000) pos1 = 1000;
+  if (pos1 < 0) pos1 = 0;
+
+  
 
 
-    Serial.printf("POS: 1:%d   2:%d   3:%d   4:%d   5:%d   6:%d \n",
-                pos1, pos2, pos3, pos4, pos5, pos6);
-    
-    sendMove((uint8_t)1, pos1);
-    sendMove((uint8_t)2, pos2);
-    sendMove((uint8_t)3, pos3);
-    sendMove((uint8_t)4, pos4);
-    sendMove((uint8_t)5, pos5);
-    sendMove((uint8_t)6, pos6);
+  Serial.printf("POS: 1:%d   2:%d   3:%d   4:%d   5:%d   6:%d \n",
+              pos1, pos2, pos3, pos4, pos5, pos6);
+  
+  sendMove((uint8_t)1, pos1);
+  sendMove((uint8_t)2, pos2);
+  sendMove((uint8_t)3, pos3);
+  sendMove((uint8_t)4, pos4);
+  sendMove((uint8_t)5, pos5);
+  sendMove((uint8_t)6, pos6);
 }
