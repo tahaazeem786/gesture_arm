@@ -147,7 +147,7 @@ void mpuTranslateData(float &gx, float &gy, float &gz) {
 }
 
 
-void readFlexSensor(int8_t &flexADC) {
+void readFlexSensor(uint8_t &flexADC) {
     flexADC = analogRead(FLEX_PIN);
     float voltage = (flexADC / (float)ADC_MAX) * VCC;
     float flexResistance = (R_DIVIDER * voltage) / (VCC - voltage);
@@ -158,7 +158,7 @@ void readFlexSensor(int8_t &flexADC) {
     // ADC sits from 60-90 when unflexed, goes to 0 or ~140 when flexed.
 }
 
-void readPushButton(int8_t &pushADC) {
+void readPushButton(uint8_t &pushADC) {
     pushADC = analogRead(PUSH_PIN);
     float voltage = (pushADC / (float)ADC_MAX) * VCC;
     Serial.printf("Push Button: ADC=%d  Voltage=%.2fV\n",
