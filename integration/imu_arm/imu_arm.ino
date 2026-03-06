@@ -8,6 +8,7 @@ HardwareSerial armSerial(1);
 #define PUSH_PIN 39
 
 static uint16_t moveTime = 800;
+static int pos1lockout = 0;
 
 // ── MPU-6050 ──────────────────────────────────────────────────────────────────
 #define MPU_ADDR      0x68   // ADO=GND → 0x68
@@ -188,7 +189,6 @@ void setup() {
 
 void loop() {
   // get imu data
-  static int pos1Lockdebouout = 0;
 
   // default vals x -0.13, y -0.08, z 1.01
   float gx, gy, gz;
