@@ -8,7 +8,7 @@ HardwareSerial armSerial(1);
 #define PUSH_PIN 39
 
 static uint16_t moveTime = 800;
-static int pos1lockout = 0;
+static int pos1Lockout = 0;
 
 // ── MPU-6050 ──────────────────────────────────────────────────────────────────
 #define MPU_ADDR      0x68   // ADO=GND → 0x68
@@ -246,12 +246,12 @@ void loop() {
   }
 
   // if push button, then toggle between 1000 and 0 on id 1
-  if (pushADC > 50 && pos1 <= 500) {
+  if (pushADC > 50 && pos1 <= 500 && pos1Lockout == 0) {
       pos1 = 700; // CLOSED
-      pos1lockout = 250;
-  } else if (pushADC > 50 && pos1 >= 500) {
+      pos1Lockout = 250;
+  } else if (pushADC > 50 && pos1 >= 500 && pos1Lockout == 0) {
       pos1 = 0;  // OPEN
-      post1lockout = 250;
+      pos1Lockout = 250;
   }
 
   if (pos6 > 1000) pos6 = 1000;
