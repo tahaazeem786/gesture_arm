@@ -195,7 +195,8 @@ void loop() {
   readFlexSensor(flexADC);
   readPushButton(pushADC);
   
-  
+  Serial.printf("IMU: gx=%.2f  gy=%.2f  \n",
+              gx, gy);
   Serial.printf("Flex ADC: %d   Push ADC: %d \n",
               flexADC, pushADC);
 
