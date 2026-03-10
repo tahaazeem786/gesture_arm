@@ -56,10 +56,12 @@ void sendMultiMove(uint8_t count, const uint8_t* ids, const uint16_t* positions)
   }
 
   armSerial.write(frame, idx);
-  delay(100);
+  delay(10);
 }
 
 void sendMove(uint8_t id, uint16_t pos) {
+  if (pos > 1000) pos = 1000;
+  if (pos < 0) pos = 0;
   uint8_t ids[1] = { id };
   uint16_t positions[1] = { pos };
   sendMultiMove(1, ids, positions);
@@ -207,35 +209,45 @@ void loop() {
 
     // X CONTROL WHEN UNFLEXED
     if(gx > 0.4) {
-      pos6 = pos6 - 100;
+      pos6 = pos6 - 25;
+      sendMove((uint8_t)6, pos6);
     } else if (gx < -0.5) {
-      pos6 = pos6 + 100;
+      pos6 = pos6 + 25;
+      sendMove((uint8_t)6, pos6);
     }
 
     // Y CONTROL WHEN UNFLEXED
     if(gy > 0.4) {
-      pos4 = pos4 - 100;
-      pos5 = pos5 - 100;
+      pos4 = pos4 - 25;
+      pos5 = pos5 - 25;
+      sendMove((uint8_t)4, pos4);
+      sendMove((uint8_t)5, pos5);
     } else if (gy < -0.4) {
-      pos5 = pos5 + 100;
-      pos4 = pos4 + 100;
+      pos5 = pos5 + 25;
+      pos4 = pos4 + 25;
+      sendMove((uint8_t)4, pos4);
+      sendMove((uint8_t)5, pos5);
     }
 
   } else {
     // flexed, control 2,3 with X,Y
-
+    
     // X CONTROL WHEN FLEXED
     if(gx > 0.4) {
-      pos2 = pos2 - 100;
+      pos2 = pos2 - 25;
+      sendMove((uint8_t)2, pos2);
     } else if (gx < -0.5) {
-      pos2 = pos2 + 100;
+      pos2 = pos2 + 25;
+      sendMove((uint8_t)2, pos2);
     }
 
     // Y CONTROL WHEN FLEXED
     if(gy > 0.4) {
-      pos3 = pos3 - 100;
+      pos3 = pos3 - 25;
+      sendMove((uint8_t)3, pos3);
     } else if (gy < -0.4) {
-      pos3 = pos3 + 100;
+      pos3 = pos3 + 25;
+      sendMove((uint8_t)3, pos3);
     }
   }
 
@@ -245,38 +257,20 @@ void loop() {
 
   // if push button, then toggle between 1000 and 0 on id 1
   if (pushADC > 50 && pos1 <= 500 && pos1Lockout == 0) {
-      pos1 = 700; // CLOSED
-      pos1Lockout = 5;
+    while (pos1 < 700) { //close
+      pos1 = pos1 + 25;
+      sendMove((uint8_t)1, pos1);
+    }
+    pos1Lockout = 5;
   } else if (pushADC > 50 && pos1 >= 500 && pos1Lockout == 0) {
-      pos1 = 0;  // OPEN
-      pos1Lockout = 5;
+      while (pos1 >= 25) { //open
+      pos1 = pos1 - 25;
+      sendMove((uint8_t)1, pos1);
+    }
+    pos1Lockout = 5;
   }
-
-  if (pos6 > 1000) pos6 = 1000;
-  if (pos6 < 0) pos6 = 0;
-  if (pos5 > 1000) pos5 = 1000;
-  if (pos5 < 0) pos5 = 0;
-  if (pos4 > 1000) pos4 = 1000;
-  if (pos4 < 0) pos4 = 0;
-
-  // mess with pos2 and 3 tuning for claw positioning
-  if (pos3 > 1000) pos3 = 1000;
-  if (pos3 < 0) pos3 = 0;
-  if (pos2 > 1000) pos2 = 1000;
-  if (pos2 < 0) pos2 = 0;
-  if (pos1 > 1000) pos1 = 1000;
-  if (pos1 < 0) pos1 = 0;
-
-  
-
 
   Serial.printf("POS: 1:%d   2:%d   3:%d   4:%d   5:%d   6:%d \n",
               pos1, pos2, pos3, pos4, pos5, pos6);
   
-  sendMove((uint8_t)1, pos1);
-  sendMove((uint8_t)2, pos2);
-  sendMove((uint8_t)3, pos3);
-  sendMove((uint8_t)4, pos4);
-  sendMove((uint8_t)5, pos5);
-  sendMove((uint8_t)6, pos6);
 }
