@@ -56,7 +56,7 @@ void sendMultiMove(uint8_t count, const uint8_t* ids, const uint16_t* positions)
   }
 
   armSerial.write(frame, idx);
-  delay(10);
+  delay(100);
 }
 
 void sendMove(uint8_t id, uint16_t pos) {
@@ -257,13 +257,13 @@ void loop() {
 
   // if push button, then toggle between 1000 and 0 on id 1
   if (pushADC > 50 && pos1 <= 500 && pos1Lockout == 0) {
-    while (pos1 < 700) { //close
+    while (pos1 < 600) { //close
       pos1 = pos1 + 25;
       sendMove((uint8_t)1, pos1);
     }
     pos1Lockout = 5;
   } else if (pushADC > 50 && pos1 >= 500 && pos1Lockout == 0) {
-      while (pos1 >= 25) { //open
+      while (pos1 >= 300) { //open
       pos1 = pos1 - 25;
       sendMove((uint8_t)1, pos1);
     }
