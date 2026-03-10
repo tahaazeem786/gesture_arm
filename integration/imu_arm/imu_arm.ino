@@ -56,7 +56,7 @@ void sendMultiMove(uint8_t count, const uint8_t* ids, const uint16_t* positions)
   }
 
   armSerial.write(frame, idx);
-  delay(100);
+  delay(200);
 }
 
 void sendMove(uint8_t id, uint16_t pos) {
@@ -132,7 +132,7 @@ void mpuSetup() {
     }
 
     mpuWrite(REG_PWR_MGMT, 0x00);
-    delay(100);
+    delay(200);
 }
 
 // Change the function to return void, but take pointers or references
