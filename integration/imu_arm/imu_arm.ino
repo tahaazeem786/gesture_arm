@@ -58,7 +58,7 @@ void sendMultiMove(uint8_t count, const uint8_t* ids, const uint16_t* positions)
   armSerial.write(frame, idx);
   delay(200);
 }
-
+// move function for single servo, just a wrapper around the multi version
 void sendMove(uint8_t id, uint16_t pos) {
   if (pos > 1000) pos = 1000;
   if (pos < 0) pos = 0;
@@ -67,6 +67,7 @@ void sendMove(uint8_t id, uint16_t pos) {
   sendMultiMove(1, ids, positions);
 }
 
+// For Debugging and sending manual commands via Serial Monitor
 String readLine() {
   static String buf;
   while (Serial.available()) {
@@ -83,6 +84,7 @@ String readLine() {
   return "";
 }
 
+// reset all servos back to pos 500
 void resetAll() {
   uint8_t ids[6] = {1,2,3,4,5,6};
   uint16_t positions[6] = {500,500,500,500,500,500};
@@ -90,6 +92,8 @@ void resetAll() {
   sendMultiMove(6, ids, positions);
 }
 
+
+// same as above but sequentially with a delay
 void resetAllSequential() {
   Serial.println("Resetting all servos to 500 (sequential)...");
   for (uint8_t id = 1; id <= 6; id++) {
@@ -101,7 +105,7 @@ void resetAllSequential() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // IMU helper functions (MPU-6050)
-
+// write to IMU
 void mpuWrite(uint8_t reg, uint8_t val) {
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(reg);
@@ -109,6 +113,7 @@ void mpuWrite(uint8_t reg, uint8_t val) {
   Wire.endTransmission();
 }
 
+// read from IMU
 void mpuRead(uint8_t reg, uint8_t *buf, uint8_t len) {
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(reg);
@@ -119,6 +124,7 @@ void mpuRead(uint8_t reg, uint8_t *buf, uint8_t len) {
   }
 }
 
+// IMU init
 void mpuSetup() {
     Wire.begin(21, 22);   // SDA=21, SCL=22
 
@@ -135,7 +141,7 @@ void mpuSetup() {
     delay(200);
 }
 
-// Change the function to return void, but take pointers or references
+// get data from IMU and convert to g's 
 void mpuTranslateData(float &gx, float &gy, float &gz) {
     uint8_t raw[6];
     mpuRead(REG_ACCEL_X_H, raw, 6);
@@ -149,7 +155,7 @@ void mpuTranslateData(float &gx, float &gy, float &gz) {
     gz = az / 16384.0f;
 }
 
-
+// get flex sensor ADC value
 void readFlexSensor(uint8_t &flexADC) {
     flexADC = analogRead(FLEX_PIN);
     float voltage = (flexADC / (float)ADC_MAX) * VCC;
@@ -161,6 +167,7 @@ void readFlexSensor(uint8_t &flexADC) {
     // ADC sits from 60-90 when unflexed, goes to 0 or ~140 when flexed.
 }
 
+// get push button ADC value
 void readPushButton(uint8_t &pushADC) {
     pushADC = analogRead(PUSH_PIN);
     float voltage = (pushADC / (float)ADC_MAX) * VCC;
@@ -171,7 +178,7 @@ void readPushButton(uint8_t &pushADC) {
     // ADC sits from 1690 when pushed
 }
 
-
+// init 
 void setup() {
     
     // ARM SETUP
@@ -189,6 +196,7 @@ void setup() {
 
 }
 
+// main loop looping through reading IMU, flex sensor, and push button, then sending commands to the arm based on that data
 void loop() {
   // get imu data
 
